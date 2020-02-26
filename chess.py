@@ -182,45 +182,48 @@ class Board:
                 break
         if team == "white":
             self.danger_w += danger
+            self.danger_w += self.takes
         else:
             self.danger_b += danger
+            self.danger_b += self.takes
         return moves
     
     
     def knight_moves(self, team, position):
         moves = []
+        danger = []
         if self.is_empty((position[0]+2, position[1]+1)):
             moves.append((position[0]+2, position[1]+1))
         else: 
-            self.danger.append((position[0]+2, position[1]+1))
+            danger.append((position[0]+2, position[1]+1))
         if self.is_empty((position[0]-2, position[1]+1)):
             moves.append((position[0]-2, position[1]+1))
         else: 
-            self.danger.append((position[0]-2, position[1]+1))
+            danger.append((position[0]-2, position[1]+1))
         if self.is_empty((position[0]+2, position[1]-1)):
             moves.append((position[0]+2, position[1]-1))
         else: 
-            self.danger.append((position[0]+2, position[1]-1))
+            danger.append((position[0]+2, position[1]-1))
         if self.is_empty((position[0]-2, position[1]-1)):
             moves.append((position[0]-2, position[1]-1))
         else: 
-            self.danger.append((position[0]-2, position[1]-1))
+            danger.append((position[0]-2, position[1]-1))
         if self.is_empty((position[0]+1, position[1]+2)):
             moves.append((position[0]+1, position[1]+2))
         else: 
-            self.danger.append((position[0]+1, position[1]+2))
+            danger.append((position[0]+1, position[1]+2))
         if self.is_empty((position[0]-1, position[1]+2)):
             moves.append((position[0]-1, position[1]+2))
         else: 
-            self.danger.append((position[0]-1, position[1]+2))
+            danger.append((position[0]-1, position[1]+2))
         if self.is_empty((position[0]+1, position[1]-2)):
             moves.append((position[0]+1, position[1]-2))
         else: 
-            self.danger.append((position[0]+1, position[1]-2))
+            danger.append((position[0]+1, position[1]-2))
         if self.is_empty((position[0]-1, position[1]-2)):
             moves.append((position[0]-1, position[1]-2))
         else: 
-            self.danger.append((position[0]-1, position[1]-2))
+            danger.append((position[0]-1, position[1]-2))
 
         if self.is_enemy(team, (position[0]+2, position[1]+1)):
             self.takes.append((position[0]+2, position[1]+1))
@@ -238,11 +241,18 @@ class Board:
             self.takes.append((position[0]+1, position[1]-2))
         if self.is_enemy(team, (position[0]-1, position[1]-2)):
             self.takes.append((position[0]-1, position[1]-2))
+        if team == "white":
+            self.danger_w += danger
+            self.danger_w += self.takes
+        else:
+            self.danger_b += danger
+            self.danger_b += self.takes
         return moves
     
     
     def bishop_moves(self, team, position):
         moves = []
+        danger = []
         for i in range(1,8):
             if self.is_empty((position[0]+i, position[1]+i)):
                 moves.append((position[0]+i, position[1]+i))
@@ -250,7 +260,7 @@ class Board:
                 self.takes.append((position[0]+i, position[1]+i))
                 break
             else: 
-                self.danger.append((position[0]+i, position[1]+i))
+                danger.append((position[0]+i, position[1]+i))
                 break
         for i in range(1,8):
             if self.is_empty((position[0]-i, position[1]-i)):
@@ -259,7 +269,7 @@ class Board:
                 self.takes.append((position[0]-i, position[1]-i))
                 break
             else: 
-                self.danger.append((position[0]-i, position[1]-i))
+                danger.append((position[0]-i, position[1]-i))
                 break
         for i in range(1,8):
             if self.is_empty((position[0]-i, position[1]+i)):
@@ -268,7 +278,7 @@ class Board:
                 self.takes.append((position[0] - i, position[1]+i))
                 break
             else: 
-                self.danger.append((position[0] - i, position[1]+i))
+                danger.append((position[0] - i, position[1]+i))
                 break
         for i in range(1,8):
             if self.is_empty((position[0]+i, position[1]-i)):
@@ -279,6 +289,12 @@ class Board:
             else: 
                 self.danger.append((position[0]+i, position[1]-i))
                 break
+        if team == "white":
+            self.danger_w += danger
+            self.danger_w += self.takes
+        else:
+            self.danger_b += danger
+            self.danger_b += self.takes
         return moves
     
     
@@ -326,6 +342,7 @@ class Board:
     
     def pawn_moves(self, team, position):
         moves = []
+        danger = []
         direc = 1
         if team == "white":
             direc = -1
@@ -337,6 +354,12 @@ class Board:
             self.takes.append((position[0]-1, position[1] + direc))
         if self.is_enemy(team, (position[0]+1, position[1] + direc)):
             self.takes.append((position[0]+1, position[1] + direc))
+        if team == "white":
+            self.danger_w += danger
+            self.danger_w += self.takes
+        else:
+            self.danger_b += danger
+            self.danger_b += self.takes
         return moves
     
     
@@ -457,6 +480,8 @@ class Board:
     def danger_zone(self, team):
         self.takes = []
         self.danger = []
+        self.danger_w = []
+        self.danger_b = []
         for piece in self.pieces:
             if piece.team != team:
                 if piece.kind == "pawn":
@@ -475,19 +500,26 @@ class Board:
                 else:
                     self.takes += self.pick_moves(piece.team, piece.position)
         self.danger += self.takes
+        # Removes duplicates
         self.danger = list(dict.fromkeys(self.danger))
         self.in_board()
-        self.draw_danger()
+        self.draw_danger(team)
         self.takes = []
         self.moves = []
         
    
-    def draw_danger(self):
-        locations = self.danger
+    def draw_danger(self, team):
+        if team == "white":
+            
+            locations = self.danger_b
+        else:
+            
+            locations = self.danger_w
+        # locations = self.danger
         for location in locations:
             pygame.draw.rect(gameDisplay,RED,[location[0]*SIZE + 160, location[1]*SIZE + 160, SIZE, SIZE])
    
-   
+    # TODO: Add DANGER_W/_B
     def in_board(self):
         for i in range(100):
             for position in self.danger:
@@ -498,8 +530,10 @@ class Board:
 
     def in_danger(self, team):
         if team == "white":
+            
             danger = self.danger_b
         else:
+            
             danger = self.danger_w
         for piece in self.pieces:
             if piece.kind == "king" and piece.team == team:
@@ -514,10 +548,12 @@ class Board:
         else:
             return "white"
 
-    def draw_check(self, position):
-        image = pygame.image.load(r'C:\Users\Tom\Documents\Chess\assets\check.png') 
-        gameDisplay.blit(image, (160 + position[0]* SIZE, 160 + position[1]* SIZE))
 
+    def draw_check(self, position):
+        path = str(Path.home())
+        path += "\\Trifecta\\assets\\" + "check.png"
+        image = pygame.image.load(path)
+        gameDisplay.blit(image, (160 + position[0]* SIZE, 160 + position[1]* SIZE))
 
 
 board = Board(60, 8, 160)
