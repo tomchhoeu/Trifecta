@@ -54,7 +54,7 @@ class Board:
                 self.danger_zone(self.turn) 
         
         self.in_danger((board.turn))
-        
+        #self.promotion()
         
 
     def __create_pieces(self):
@@ -117,28 +117,50 @@ class Board:
         return False
 
 
-    def get_piece(self, team, position):
+    def get_piece(self, position):
         for piece in self.pieces:
-            if piece.position == position and piece.team == team:
+            if piece.position == position:
                 return piece
         return None
 
     # returns list of availiable moves
     def pick_moves(self, team, position):
-        
-        kind = self.get_piece(team, position).kind       
-        if kind == "pawn":
-            return self.pawn_moves(team, position)
-        elif kind == "rook":
-            return self.rook_moves(team, position)
-        elif kind == "knight":
-            return self.knight_moves(team, position)
-        elif kind == "bishop":
-            return self.bishop_moves(team, position)
-        elif kind == "queen":
-            return self.bishop_moves(team, position) + self.rook_moves(team, position)
-        elif kind == "king":
-            return self.king_moves(team, position) + self.castle(team, position)
+        if self.checked == True:
+            kind = self.get_piece(position).kind       
+            if kind == "pawn":
+                moves = self.pawn_moves(team, position)
+            elif kind == "rook":
+                moves = self.rook_moves(team, position)
+            elif kind == "knight":
+                moves = self.knight_moves(team, position)
+            elif kind == "bishop":
+                moves = self.bishop_moves(team, position)
+            elif kind == "queen":
+                moves = self.bishop_moves(team, position) + self.rook_moves(team, position)
+            elif kind == "king":
+                moves = self.king_moves(team, position) + self.castle(team, position)
+                return moves
+            # for move in moves:
+            #     save = self.pieces
+            #     move_piece(position, move)
+            #     self.in_danger(team)
+            #     if self.checked == True:
+            #         moves.remove(move)
+            #     self.pieces = save
+        else: 
+            kind = self.get_piece(position).kind       
+            if kind == "pawn":
+                return self.pawn_moves(team, position)
+            elif kind == "rook":
+                return self.rook_moves(team, position)
+            elif kind == "knight":
+                return self.knight_moves(team, position)
+            elif kind == "bishop":
+                return self.bishop_moves(team, position)
+            elif kind == "queen":
+                return self.bishop_moves(team, position) + self.rook_moves(team, position)
+            elif kind == "king":
+                return self.king_moves(team, position) + self.castle(team, position)
     
     
     def rook_moves(self, team, position):
@@ -383,14 +405,19 @@ class Board:
     
     def pawn_attacks(self, team, position):
         moves = []
+        danger = []
         direc = 1
         
         if team == "white":
             direc = -1
-        if (position[0] - 1) > 0 and (position[1] + direc) > 0 and (position[1] + direc) < 7:
+        if (position[0] - 1) >= 0 and (position[1] + direc) >= 0 and (position[1] + direc) <= 7:
             moves.append((position[0]-1, position[1] + direc))
-        if (position[0] + 1) < 7 and (position[1] + direc) > 0 and (position[1] + direc) < 7:
+        if (position[0] + 1) <= 7 and (position[1] + direc) >= 0 and (position[1] + direc) <= 7:
             moves.append((position[0]+1, position[1] + direc))
+        if team == "white":
+            self.danger_w += moves
+        else:
+            self.danger_b += moves
         return moves
         
     
@@ -443,10 +470,11 @@ class Board:
    
    
     def take_piece(self, location1, location2):
-        for piece in self.pieces:
-            if piece.position == location2:
-                self.pieces.remove(piece)
-                break
+        self.pieces.remove(self.get_piece(location2))
+        # for piece in self.pieces:
+        #     if piece.position == location2:
+        #         self.pieces.remove(piece)
+        #         break
         for piece in self.pieces:
             if piece.position == location1:
                 piece.position = location2
@@ -513,7 +541,6 @@ class Board:
             
             locations = self.danger_b
         else:
-            
             locations = self.danger_w
         # locations = self.danger
         for location in locations:
@@ -524,16 +551,14 @@ class Board:
         for i in range(100):
             for position in self.danger:
                 if position[0] > 7 or position[0] < 0 or position[1] > 7 or position[1] < 0:
-                    self.danger.remove(position)
+                    #self.danger.remove(position)
                     break
 
 
     def in_danger(self, team):
         if team == "white":
-            
             danger = self.danger_b
         else:
-            
             danger = self.danger_w
         for piece in self.pieces:
             if piece.kind == "king" and piece.team == team:
