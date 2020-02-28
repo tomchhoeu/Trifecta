@@ -125,43 +125,43 @@ class Board:
 
     # returns list of availiable moves
     def pick_moves(self, team, position):
-        if self.checked == True:
-            kind = self.get_piece(position).kind       
-            if kind == "pawn":
-                moves = self.pawn_moves(team, position)
-            elif kind == "rook":
-                moves = self.rook_moves(team, position)
-            elif kind == "knight":
-                moves = self.knight_moves(team, position)
-            elif kind == "bishop":
-                moves = self.bishop_moves(team, position)
-            elif kind == "queen":
-                moves = self.bishop_moves(team, position) + self.rook_moves(team, position)
-            elif kind == "king":
-                moves = self.king_moves(team, position) + self.castle(team, position)
-                return moves
-            # for move in moves:
-            #     save = self.pieces
-            #     move_piece(position, move)
-            #     self.in_danger(team)
-            #     if self.checked == True:
-            #         moves.remove(move)
-            #     self.pieces = save
-        else: 
-            kind = self.get_piece(position).kind       
-            if kind == "pawn":
-                return self.pawn_moves(team, position)
-            elif kind == "rook":
-                return self.rook_moves(team, position)
-            elif kind == "knight":
-                return self.knight_moves(team, position)
-            elif kind == "bishop":
-                return self.bishop_moves(team, position)
-            elif kind == "queen":
-                return self.bishop_moves(team, position) + self.rook_moves(team, position)
-            elif kind == "king":
-                return self.king_moves(team, position) + self.castle(team, position)
-    
+        # if self.checked == True:
+        #     kind = self.get_piece(position).kind       
+        #     if kind == "pawn":
+        #         moves = self.pawn_moves(team, position)
+        #     elif kind == "rook":
+        #         moves = self.rook_moves(team, position)
+        #     elif kind == "knight":
+        #         moves = self.knight_moves(team, position)
+        #     elif kind == "bishop":
+        #         moves = self.bishop_moves(team, position)
+        #     elif kind == "queen":
+        #         moves = self.bishop_moves(team, position) + self.rook_moves(team, position)
+        #     elif kind == "king":
+        #         moves = self.king_moves(team, position) + self.castle(team, position)
+        #         return moves
+        #     # for move in moves:
+        #     #     save = self.pieces
+        #     #     move_piece(position, move)
+        #     #     self.in_danger(team)
+        #     #     if self.checked == True:
+        #     #         moves.remove(move)
+        #     #     self.pieces = save
+        # else: 
+        kind = self.get_piece(position).kind       
+        if kind == "pawn":
+            return self.pawn_moves(team, position)
+        elif kind == "rook":
+            return self.rook_moves(team, position)
+        elif kind == "knight":
+            return self.knight_moves(team, position)
+        elif kind == "bishop":
+            return self.bishop_moves(team, position)
+        elif kind == "queen":
+            return self.bishop_moves(team, position) + self.rook_moves(team, position)
+        elif kind == "king":
+            return self.king_moves(team, position) + self.castle(team, position)
+
     
     def rook_moves(self, team, position):
         moves = []
@@ -210,8 +210,20 @@ class Board:
             self.danger_b += self.takes
         return moves
     
-    
+    # TODO: Create a functions that takes in a list of positions and 
+    # Checks if they are on the board
+    # Checks if they are an enemy
+    # Checks if they are an empty square
+    # Checks if they are an ally
     def knight_moves(self, team, position):
+        delta = [(1,2), (-1,2), (1,-2), (-1,-2), (2,1), (-2,1), (2,-1), (-2,-1)]
+        moves2 = []
+        x, y = position
+        for value in delta:
+            data = (x+value[0], y+value[1])
+            if self.is_empty(data)
+                moves2.append(data)
+        print(moves2)
         moves = []
         danger = []
         if self.is_empty((position[0]+2, position[1]+1)):
@@ -309,7 +321,7 @@ class Board:
                 self.takes.append((position[0]+i, position[1]-i))
                 break
             else: 
-                self.danger.append((position[0]+i, position[1]-i))
+                danger.append((position[0]+i, position[1]-i))
                 break
         if team == "white":
             self.danger_w += danger
@@ -456,7 +468,7 @@ class Board:
                 else:
                     self.turn = "white"
         self.moves = []
-        self.danger_zone(self.turn)
+        #self.danger_zone(self.turn)
     def n_moves(self, position):
         for piece in self.pieces:
                 if piece.position == position:
@@ -484,7 +496,7 @@ class Board:
                 else:
                     self.turn = "white"
         # self.checked = False
-        self.danger_zone(self.turn)
+        #self.danger_zone(self.turn)
     
     def draw_takes(self):
         locations = self.takes
@@ -527,9 +539,13 @@ class Board:
                     ]
                 else:
                     self.takes += self.pick_moves(piece.team, piece.position)
-        self.danger += self.takes
         # Removes duplicates
-        self.danger = list(dict.fromkeys(self.danger))
+        if team == "white":
+            self.danger_w += self.takes
+            self.danger_w = list(dict.fromkeys(self.danger_w))
+        else:
+            self.danger_b += self.takes
+            self.danger_b = list(dict.fromkeys(self.danger_b))
         self.in_board()
         self.draw_danger(team)
         self.takes = []
@@ -537,22 +553,29 @@ class Board:
         
    
     def draw_danger(self, team):
+        print("DNAGER")
         if team == "white":
-            
             locations = self.danger_b
         else:
             locations = self.danger_w
-        # locations = self.danger
         for location in locations:
+            print(location)
             pygame.draw.rect(gameDisplay,RED,[location[0]*SIZE + 160, location[1]*SIZE + 160, SIZE, SIZE])
    
     # TODO: Add DANGER_W/_B
     def in_board(self):
-        for i in range(100):
-            for position in self.danger:
-                if position[0] > 7 or position[0] < 0 or position[1] > 7 or position[1] < 0:
-                    #self.danger.remove(position)
-                    break
+        if self.turn == "black":
+            for i in range(100):
+                for position in self.danger_w:
+                    if position[0] > 7 or position[0] < 0 or position[1] > 7 or position[1] < 0:
+                        self.danger_w.remove(position)
+                        break
+        else:
+            for i in range(100):
+                for position in self.danger_b:
+                    if position[0] > 7 or position[0] < 0 or position[1] > 7 or position[1] < 0:
+                        self.danger_b.remove(position)
+                        break
 
 
     def in_danger(self, team):
