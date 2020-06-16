@@ -1,4 +1,4 @@
-from functions import *
+from classes import *
 import time
 from math import floor, sqrt
 '''
@@ -6,6 +6,17 @@ Three classes
 Chess - game itself
 Board - rendering the board - maintaining rules
 Pieces - moving and stuff
+
+Requirements:
+    Given a move determine if the move is valid.
+        A move is valid if it doesn't lead to own team being in check.
+            Given a board state determine if king is in check
+                Find location of king
+                Find all places enemy could attack. 
+Problem:
+    I used the move deciding algorithm in order to determine if places enemy could attack so it ends up causing an infinite loop
+Solution:
+    Use a different method. 
 '''
 # FONT
 font = pygame.font.Font('freesansbold.ttf', 32) 
@@ -36,6 +47,7 @@ class Board:
 
 
     def draw(self):
+        
         cnt = 0
         for i in range(self.board_length):
             for z in range(self.board_length):
@@ -45,15 +57,28 @@ class Board:
                     pygame.draw.rect(gameDisplay, BLACK, [self.offset + self.size * z, self.offset + self.size * i, self.size, self.size])
                 cnt +=1
             cnt -= 1
-        
+        pygame.draw.rect(gameDisplay, BLACK,[self.offset - self.size * 2, self.offset + self.size*1, self.size, self.size])
+        pygame.draw.rect(gameDisplay, BLACK,[self.offset - self.size * 2, self.offset + self.size*6, self.size, self.size])
+
         pygame.draw.rect(gameDisplay,BLACK,[self.offset, self.offset, self.board_length * self.size - 1, self.board_length * self.size-1],2)
         if self.clicked:
             clicked_x, clicked_y = self.clicked
-            pygame.draw.rect(gameDisplay, RED,[self.offset + self.size * clicked_x, self.offset + self.size * clicked_y, self.size, self.size])
-            if self.clicked[0] < 0 or self.clicked[1] < 0:
-                self.danger_zone(self.turn) 
+            if self.clicked[0] >= 0 and self.clicked[1] >= 0 and self.clicked[0] < 8 and self.clicked[1] < 8:
+                pygame.draw.rect(gameDisplay, RED,[self.offset + self.size * clicked_x, self.offset + self.size * clicked_y, self.size, self.size])
+            elif self.clicked[0] == -2 and self.clicked[1] == 1: 
+                pygame.draw.rect(gameDisplay, RED,[self.offset + self.size * clicked_x, self.offset + self.size * clicked_y, self.size, self.size])
+                self.draw_danger("white")
+            elif self.clicked[0] == -2 and self.clicked[1] == 6:
+                pygame.draw.rect(gameDisplay, RED,[self.offset + self.size * clicked_x, self.offset + self.size * clicked_y, self.size, self.size])
+                self.draw_danger("black")
+                print("balck")
+            else:
+                print("wow")
+                self.clicked = None
+            # if self.clicked[0] < 0 or self.clicked[1] < 0:
         
-        self.in_danger((board.turn))
+        self.in_danger(board.turn, board.pieces)
+        
         #self.promotion()
         
 
@@ -79,7 +104,6 @@ class Board:
         self.pieces.append(Piece("bishop", "white", (5,7)))
         self.pieces.append(Piece("queen", "white", (3,7)))
         self.pieces.append(Piece("king", "white", (4,7)))
-
 
     def draw_pieces(self):
         for piece in self.pieces:
@@ -148,7 +172,7 @@ class Board:
         #     #         moves.remove(move)
         #     #     self.pieces = save
         # else: 
-        kind = self.get_piece(position).kind       
+        kind = self.get_piece(position).kind
         if kind == "pawn":
             return self.pawn_moves(team, position)
         elif kind == "rook":
@@ -221,9 +245,8 @@ class Board:
         x, y = position
         for value in delta:
             data = (x+value[0], y+value[1])
-            if self.is_empty(data)
+            if self.is_empty(data):
                 moves2.append(data)
-        print(moves2)
         moves = []
         danger = []
         if self.is_empty((position[0]+2, position[1]+1)):
@@ -334,7 +357,6 @@ class Board:
     
     def king_moves(self, team, position):
         moves = []
-        self.danger_zone(team)
         if self.is_empty((position[0], position[1] + 1)):
             moves.append((position[0], position[1] + 1))
         elif self.is_enemy(team, (position[0], position[1] + 1)):
@@ -468,7 +490,7 @@ class Board:
                 else:
                     self.turn = "white"
         self.moves = []
-        #self.danger_zone(self.turn)
+        self.danger_zone(board.pieces)
     def n_moves(self, position):
         for piece in self.pieces:
                 if piece.position == position:
@@ -496,7 +518,7 @@ class Board:
                 else:
                     self.turn = "white"
         # self.checked = False
-        #self.danger_zone(self.turn)
+        self.danger_zone(board.pieces)
     
     def draw_takes(self):
         locations = self.takes
@@ -517,37 +539,38 @@ class Board:
         return sqrt((position1[0] - position2[0])**2 + (position1[1] - position2[1])**2)
         
    
-    def danger_zone(self, team):
-        self.takes = []
-        self.danger = []
+    def danger_zone(self, pieces):
         self.danger_w = []
         self.danger_b = []
-        for piece in self.pieces:
-            if piece.team != team:
-                if piece.kind == "pawn":
-                    self.takes += self.pawn_attacks(piece.team, piece.position)
-                elif piece.kind == "king":
-                    self.danger += [
-                        (piece.position[0]+1, piece.position[1]+1),
-                        (piece.position[0]+1, piece.position[1]-1),
-                        (piece.position[0]+1, piece.position[1]),
-                        (piece.position[0], piece.position[1]-1),
-                        (piece.position[0]-1, piece.position[1]-1),
-                        (piece.position[0]-1, piece.position[1]+1),
-                        (piece.position[0]-1, piece.position[1]),
-                        (piece.position[0], piece.position[1]),
-                    ]
-                else:
-                    self.takes += self.pick_moves(piece.team, piece.position)
+        teams = ["white", "black"]
+        for team in teams:
+            self.takes = []
+            for piece in pieces:
+                if piece.team != team:
+                    print(piece.kind)
+                    if piece.kind == "pawn":
+                        self.takes += self.pawn_attacks(piece.team, piece.position)
+                    elif piece.kind == "king":
+                        self.takes += [
+                            (piece.position[0]+1, piece.position[1]+1),
+                            (piece.position[0]+1, piece.position[1]-1),
+                            (piece.position[0]+1, piece.position[1]),
+                            (piece.position[0], piece.position[1]-1),
+                            (piece.position[0]-1, piece.position[1]-1),
+                            (piece.position[0]-1, piece.position[1]+1),
+                            (piece.position[0]-1, piece.position[1]),
+                            (piece.position[0], piece.position[1]),
+                        ]
+                    else:
+                        self.takes += self.pick_moves(piece.team, piece.position)
         # Removes duplicates
-        if team == "white":
-            self.danger_w += self.takes
-            self.danger_w = list(dict.fromkeys(self.danger_w))
-        else:
-            self.danger_b += self.takes
-            self.danger_b = list(dict.fromkeys(self.danger_b))
+            if team == "white":
+                self.danger_b += self.takes
+                self.danger_b = list(dict.fromkeys(self.danger_b))
+            else:
+                self.danger_w += self.takes
+                self.danger_w = list(dict.fromkeys(self.danger_w))
         self.in_board()
-        self.draw_danger(team)
         self.takes = []
         self.moves = []
         
@@ -564,26 +587,24 @@ class Board:
    
     # TODO: Add DANGER_W/_B
     def in_board(self):
-        if self.turn == "black":
-            for i in range(100):
-                for position in self.danger_w:
-                    if position[0] > 7 or position[0] < 0 or position[1] > 7 or position[1] < 0:
-                        self.danger_w.remove(position)
-                        break
-        else:
-            for i in range(100):
-                for position in self.danger_b:
-                    if position[0] > 7 or position[0] < 0 or position[1] > 7 or position[1] < 0:
-                        self.danger_b.remove(position)
-                        break
+        for i in range(100):
+            for position in self.danger_w:
+                if position[0] > 7 or position[0] < 0 or position[1] > 7 or position[1] < 0:
+                    self.danger_w.remove(position)
+                    break
+        for i in range(100):
+            for position in self.danger_b:
+                if position[0] > 7 or position[0] < 0 or position[1] > 7 or position[1] < 0:
+                    self.danger_b.remove(position)
+                    break
 
 
-    def in_danger(self, team):
+    def in_danger(self, team, pieces):
         if team == "white":
             danger = self.danger_b
         else:
             danger = self.danger_w
-        for piece in self.pieces:
+        for piece in pieces:
             if piece.kind == "king" and piece.team == team:
                 if piece.position in danger:
                     self.draw_check(piece.position)
@@ -598,15 +619,29 @@ class Board:
 
 
     def draw_check(self, position):
-        path = str(Path.home())
-        path += "\\Trifecta\\assets\\" + "check.png"
+        path = "assets\\" + "check.png"
         image = pygame.image.load(path)
         gameDisplay.blit(image, (160 + position[0]* SIZE, 160 + position[1]* SIZE))
 
+    def is_valid(self, location1, location2):
+        future = self.pieces.copy()
+        for piece in future:
+            if piece.position == location1:
+                piece.position = location2
+        self.danger_zone(future)
+        print(future != self.pieces)
+        return self.in_danger(self.turn, future)
+    # def swap(self, location1, location2):
+    #     # self.future = self.pieces
+    #     # for piece in self.future:
+    #     #     if piece.position == location1:
+    #     #         piece.position = location2
+
+        
 
 board = Board(60, 8, 160)
 is_mouse_down = False
-
+board.danger_zone(board.pieces)
 while not crashed:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -628,6 +663,10 @@ while not crashed:
         is_mouse_down = False
     
     if board.is_ally(board.turn, board.clicked):
+        for location in board.pick_moves(board.turn, board.clicked):
+            if board.is_valid(board.clicked, location):
+                print("lmao")
+
         board.draw_circles(board.pick_moves(board.turn, board.clicked))
         board.draw_takes()
 
