@@ -16,9 +16,6 @@ class App:
         self.circles = []
         self.follow = None
         self.clicked = False
-    # on_init calls pygame.init() that initialize all PyGame modules. 
-    # Then it create main display - 640x400 window and try to use hardware acceleration. 
-    # At the end this routine sets _running to True.
     def on_init(self):
         pygame.init()
         self.game_display = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
@@ -52,7 +49,6 @@ class App:
         else:
             if event.type == pygame.MOUSEBUTTONUP:
                 self.clicked = False
-        # print(event)
     def on_loop(self):
         self.draw_board()
         self.draw_pieces()
@@ -119,19 +115,8 @@ class App:
             
             self.game_display.blit(image, (pygame.mouse.get_pos()[0]-30, pygame.mouse.get_pos()[1]-30)) 
     def game_end(self):
-        # print(self.game.is_end())
         if self.game.is_end():
             print("woah")
-    # _moves
-        # returns a list of available moves for a specific piece
-    # rook_moves
-    # bishop_moves
-    # knight_moves
-    # pawn_moves
-    # queen_moves
-    # king_moves
-    # valid_moves checks if move is valid.
-    # get_moves for each type of piece in piece.type gets the moves and then removes the invalid moves. 
  
 if __name__ == "__main__" :
     game = App()

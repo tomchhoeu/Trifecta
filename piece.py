@@ -34,7 +34,6 @@ class Piece:
         return self.kind
     def sort_kind(self):
         self.kind.sort()
-        print(self.kind)
     def add_move(self):
         self.moves += 1
     def is_king(self):
@@ -237,10 +236,8 @@ class Piece:
                 continue
             square = squares[value[0]+x][value[1]+y]
             if square.get_piece() == None:
-                  # square is empty
+                # square is empty
                 moves.append(square)
-                print(square.get_x(), square.get_y())
-                print("added!")
             elif square.get_piece().is_white() != player.is_white():
                 # square has enemy
                 moves.append(square)
