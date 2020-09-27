@@ -13,3 +13,9 @@ Chess board recreated in pygame window.
 Moves are shown when clicking on a piece.
 
 ![moves](/screenshots/moves.png)
+
+When a piece is taken a the piece is added to the other piece.
+
+![knightpawn0](/screenshots/knightpawn0.png)
+
+![knightpawn](/screenshots/knightpawn.png)
