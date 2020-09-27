@@ -1,12 +1,10 @@
 # Trifecta
-A variant of chess in where pieces moves can be stolen by a piece that takes it.
+A variant of chess in where pieces property can be stolen by a piece that takes it.
 
-# TODO
-* multi piece combinations
-* Castling
-* en passant
-* Promotion
-* Check mate
-* Online
+## Overview
+In order to create trifecta, you must first recreate chess. 
+![img](/assets/Assets.png)
 
-
+## TODO
+* Promotion of pawn pieces
+* Online web server using typescript and a python flask server
