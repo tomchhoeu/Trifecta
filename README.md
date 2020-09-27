@@ -50,7 +50,7 @@ Triple knight cannot be taken. (Note: this is checkmate)
 
 Triple rook can move to any unoccpied squares in addition to a regular rooks moves.
 
-
+![rook3](/screenshots/rook3.png)
 
 Triple bishop takes first enemy piece on its diagonal after it moves. 
 
@@ -59,3 +59,5 @@ Triple bishop takes first enemy piece on its diagonal after it moves.
 ![triplebishop2](/screenshots/triplebishop2.png)
 
 Trifecta.
+
+![trifecta](/screenshots/trifecta.png)
