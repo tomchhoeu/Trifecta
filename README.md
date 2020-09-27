@@ -7,7 +7,9 @@ A variant of chess in where pieces property can be stolen by a piece that takes 
 
 ## Gallery
 Chess board recreated in pygame window.
+
 ![window](/screenshots/window.png)
 
 Moves are shown when clicking on a piece.
+
 ![moves](/screenshots/moves.png)
