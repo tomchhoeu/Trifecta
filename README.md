@@ -3,7 +3,7 @@ A variant of chess in where pieces property can be stolen by a piece that takes 
 
 ## Overview
 In order to create trifecta, you must first recreate chess. 
-![img]: (assets/Assets.png)
+![img]: (/assets/Assets.png)
 
 ## TODO
 * Promotion of pawn pieces
