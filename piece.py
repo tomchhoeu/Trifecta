@@ -69,6 +69,7 @@ class Compound(Piece):
         self.allpieces["rook"] = 0
         self.allpieces["knight"] = 0
         self.allpieces["bishop"] = 0
+        self.add_move()
 
 
     def move(self, board, start, end):
@@ -83,6 +84,7 @@ class Compound(Piece):
 
     def add_piece(self, piece):
         piece.set_white(self.is_white())
+        piece.add_move()
         if self.set == True:
             return
         if piece.get_kind() == "king" or piece.get_kind() == "queen":
