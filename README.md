@@ -2,7 +2,7 @@
 A variant of chess in where pieces property can be stolen by a piece that takes it.
 
 ## TODO
-* Promotion of pawn pieces
+* Refactor a lot of code
 * Online web server using typescript and a python flask server
 
 ## Gallery
