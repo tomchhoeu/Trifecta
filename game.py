@@ -1,4 +1,3 @@
-
 from player import Player
 from board import Board
 from move import Move
@@ -18,6 +17,7 @@ class Game:
         self.turn = self.players[0]
         self.moves_played = []
         self.game_state = Status.ACTIVE
+        self.promote = None
 
     def get_board(self):
         return self.board
@@ -33,6 +33,24 @@ class Game:
 
     def set_state(self, state):
         self.game_state = state
+    
+    def get_promote(self):
+        return self.promote
+
+    def set_promote(self, kind):
+        if kind == "queen":
+            self.promote.set_piece(Queen(self.promote.get_piece().is_white()))
+            self.promote = None
+        elif kind == "rook":
+            self.promote.set_piece(Rook(self.promote.get_piece().is_white()))
+            self.promote = None
+        elif kind == "bishop":
+            self.promote.set_piece(Bishop(self.promote.get_piece().is_white()))
+            self.promote = None
+        elif kind == "knight":
+            self.promote.set_piece(Knight(self.promote.get_piece().is_white()))
+            self.promote = None
+
 
     def playerMove(self, player, start_x, start_y, end_x, end_y):
         start = self.board.get_square(start_x, start_y)
@@ -91,6 +109,11 @@ class Game:
         
         move.get_end().set_piece(piece)
         move.get_start().remove_piece()
+
+        # TODO: promote
+        if piece.get_kind() == "pawn" and (move.get_end().get_y() == 7 or move.get_end().get_y() == 0):
+            self.promote = move.get_end()
+
         if piece.get_kind() == "bishop"*3:
             self.board.bishop3(move.get_end(), piece.is_white())
         
@@ -104,7 +127,7 @@ class Game:
             else:
                 print("black won")
                 self.game_state = Status.BLACK_WIN
-
+        
         # store move
         self.moves_played.append(move)
         self.board.add_move(move)
@@ -114,4 +137,3 @@ class Game:
         else:
             self.turn = self.players[0]
         return True
-        

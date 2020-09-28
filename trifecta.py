@@ -29,7 +29,18 @@ class App:
             self._running = False
         location = pygame.mouse.get_pos()
         x, y = (math.floor((location[0]-160)/60), 7-math.floor((location[1]-160)/60))
-        if x <= 7 and y <= 7 and x >= 0 and y >= 0:
+        if self.game.get_promote() != None:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if location[0] >= 60 and location[0] <= 120:
+                    if location[1] >= 220 and location[1] <= 280:
+                        self.game.set_promote("queen")
+                    if location[1] >= 280 and location[1] <= 340:
+                        self.game.set_promote("rook")
+                    if location[1] >= 340 and location[1] <= 400:
+                        self.game.set_promote("bishop")
+                    if location[1] >= 400 and location[1] <= 460:
+                        self.game.set_promote("knight")
+        elif x <= 7 and y <= 7 and x >= 0 and y >= 0:
             square = self.game.get_board().get_square(y, x)
             piece = square.get_piece()
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -70,6 +81,7 @@ class App:
         self.draw_pieces()
         self.draw_piece()
         self.draw_circles(self.circles)
+        self.draw_promote()
         pygame.display.update()
         pass
 
@@ -155,6 +167,22 @@ class App:
         if self.follow:
             image = pygame.image.load("assets/clicked.png")
             self.game_display.blit(image, (self.follow[1]*self.square + 160, (7 - self.follow[0])*self.square + 160)) 
+
+    def draw_promote(self):
+        if self.game.get_promote() != None:
+            team = ""
+            if self.game.get_promote().get_piece().is_white():
+                team = "white"
+            else:
+                team = "black"
+            image1 = pygame.image.load("assets/" + team + "queen.png")
+            self.game_display.blit(image1, (60, 220)) 
+            image2 = pygame.image.load("assets/" + team + "rook.png")
+            self.game_display.blit(image2, (60, 280)) 
+            image3 = pygame.image.load("assets/" + team + "bishop.png")
+            self.game_display.blit(image3, (60, 340)) 
+            image4 = pygame.image.load("assets/" + team + "knight.png")
+            self.game_display.blit(image4, (60, 400)) 
 
     def game_end(self):
         if self.game.is_end():
