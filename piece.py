@@ -242,7 +242,7 @@ class Pawn(Piece):
                 if end.is_empty():
                     move = board.get_last_move()
                     if move != None:
-                        if move.get_piece_moved().get_kind() == "pawn" and abs(move.get_start().get_y() - move.get_end().get_y()) == 2 and move.get_end().get_y() == start.get_y():
+                        if move.get_piece_moved().get_kind() == "pawn" and abs(move.get_start().get_y() - move.get_end().get_y()) == 2 and move.get_end().get_y() == start.get_y() and end.get_x() == move.get_end().get_x():
                             return True
                 elif end.get_piece().is_white() != self.is_white():
                     return True
@@ -250,7 +250,7 @@ class Pawn(Piece):
                 if end.is_empty():
                     move = board.get_last_move()
                     if move != None:
-                        if move.get_piece_moved().get_kind() == "pawn" and abs(move.get_start().get_y() - move.get_end().get_y()) == 2 and move.get_end().get_y() == start.get_y():
+                        if move.get_piece_moved().get_kind() == "pawn" and abs(move.get_start().get_y() - move.get_end().get_y()) == 2 and move.get_end().get_y() == start.get_y() and end.get_x() == move.get_end().get_x():
                             return True
                 elif end.get_piece().is_white() != self.is_white():
                     return True
